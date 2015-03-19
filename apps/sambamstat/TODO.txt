@@ -1,0 +1,16 @@
+TODO
+
+ * Document classes
+
+ * Structure as in clean_ngs (cmp. http://trac.seqan.de/wiki/StyleGuide/Cpp)
+
+ * App class for global state.
+ 
+ * Switch to new argument parser.
+ 
+ * Use BamStream http://trac.seqan.de/wiki/Tutorial/BasicSamBamIO
+ 
+ * Use ${output}.tmp instead of temporary path generation.
+
+ * remove roi stuff from sambamstats
+
