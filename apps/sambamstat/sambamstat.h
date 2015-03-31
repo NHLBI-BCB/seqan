@@ -39,6 +39,8 @@
 // Version 0.18 based on problem in underlying libraries (problem with reading comments from sam file)
 // Version 0.19 adapt to new command line parser
 //              some clean-up (rm fasta support,...)
+// Version 0.20 remove sam/bam header info
+//              removed some variable in function declarations that were not used anymore
 
 #ifndef SANDBOX_JAGLA_APPS_SAMBAMSTAT_SAMBAMSTAT_H_
 #define SANDBOX_JAGLA_APPS_SAMBAMSTAT_SAMBAMSTAT_H_
@@ -66,7 +68,7 @@
 
 //#include "dataanalysis.h"
 
-#define VERSION "0.19"
+#define VERSION "0.20"
 #define PROGNAME_ID "sambamstats-ID"
 //#define PROGNAME_POS "sambamstats-POS"
 
@@ -161,8 +163,7 @@ int roiCount = 0;
 // Functions
 // ============================================================================
 
-void setupCommandLineParser(ArgumentParser & parser,
-		Options const & options) {
+void setupCommandLineParser(ArgumentParser & parser) {
 	setVersion(parser, VERSION);
 	setShortDescription(parser, "");
 	setDate(parser, "March 2015");
@@ -278,9 +279,19 @@ void intronLength(BamAlignmentRecord & record, Stats & stats,
 			}
 		}
 		ok = setTagValue(tagDict, "il", anzN); //intron length
+		if (! ok)
+		{
+			std::cerr << "error writing tag (1)" << std::endl;
+		}
 		//setTagValue(tagDict, "nl", record.tLen - anzN, 'i'); //inner length target length - introns for this read
 		ok = setTagValue(tagDict, "cl", coverageLength);
+		if (! ok)
+		{
+			std::cerr << "error writing tag (2)" << std::endl;
+		}
+
 	}
+	
 }
 
 // Set tag "ic" to the number of introns in a record.
@@ -296,6 +307,10 @@ void intronCount(BamAlignmentRecord & record, Stats & stats,
 				anzN++;
 		}
 		bool ok=setTagValue(tagDict, "ic", anzN);
+		if (! ok)
+		{
+			std::cerr << "error writing tag (3)" << std::endl;
+		}
 		unsigned len = length(stats.intronCHisto);
 		resize(stats.intronCHisto, std::max(len, anzN + 1), 0);
 		stats.intronCHisto[anzN]++;
@@ -304,8 +319,7 @@ void intronCount(BamAlignmentRecord & record, Stats & stats,
 
 // Compute average quality value of quality string.
 
-void averageQV(BamAlignmentRecord & record, Stats & stats,
-		BamTagsDict & tagDict) {
+void averageQV(BamAlignmentRecord & record, Stats & stats) {
 
 	CharString scores = record.qual;
 
@@ -347,9 +361,9 @@ void lengthHist(Stats& stats, BamAlignmentRecord& record) {
 }
 
 // Create temporary BAM file.
-//	createTmpFile(tmpFPnam, options, reader, bFile);
+//	createTmpFile(tmpFPnam, options, bFile);
 
-void createTmpFile(char * tmpFPnam, Options const & options, BamFileIn & bamFileIn,
+void createTmpFile(char * tmpFPnam, Options const & options,
 		BamFileOut & outFile) {
 	char * tmpDir = NULL;
 	char defaultTMPDIR[4095] = "/tmp";
@@ -392,10 +406,9 @@ void createTmpFile(char * tmpFPnam, Options const & options, BamFileIn & bamFile
 		exit(-1);
 	}
 }
-//	printStatsIDsorted(stats, reader, options, reads);
+//	printStatsIDsorted(stats, reader);
 
-void printStatsIDsorted(Stats stats, BamFileIn & bamFileIn, const Options& options,
-		__int64 reads) {
+void printStatsIDsorted(Stats stats, BamFileIn & bamFileIn) {
 
 
     TBamContext const & bamContext = context(bamFileIn);
@@ -524,13 +537,11 @@ int analyze_idSorted(BamFileIn & reader, Options const & options, BamHeader  & h
 	double programStartTime = sysTime();
 	String<__uint64> qualSum;
 	Align<Dna5String> align;
-	__int64 reads = 0;
 	//
 	int writeFail = 0;
 	Stats stats;
 	resize(stats.flagsHisto, 65536, 0);
 	char tmpFPnam[2000];
-	FILE *sFile;
 	BamFileOut bFile(context(reader));
 	BamFileOut bamFileStdOut(context(reader), std::cout, Sam());
 
@@ -581,11 +592,11 @@ int analyze_idSorted(BamFileIn & reader, Options const & options, BamHeader  & h
 
 	// Create temporary file to ensure that the file is ordered by ID and not overwrite output file
 	// if file is not properly sorted the header section will not be written correctly
-	createTmpFile(tmpFPnam, options, reader, bFile);
+	createTmpFile(tmpFPnam, options, bFile);
 
 	writeHeader(bFile, newHeader);
-	if (options.verbosity >= 2)
-		writeHeader(bamFileStdOut, newHeader);
+//	if (options.verbosity >= 2)
+//		writeHeader(bamFileStdOut, newHeader);
 
 	resize(stats.rIDs, length(bamContext) + 1, 0);
 	StringSet<BamAlignmentRecord> idSet;
@@ -596,9 +607,7 @@ int analyze_idSorted(BamFileIn & reader, Options const & options, BamHeader  & h
 	// Read alignments.
 	if (options.verbosity >= 2)
 		std::cerr << "Reading alignments" << std::endl;
-	unsigned maxLen = 1;
 	unsigned readCounter = 0;
-	bool foundMultiHit = false;
 
 
 
@@ -658,7 +667,7 @@ int analyze_idSorted(BamFileIn & reader, Options const & options, BamHeader  & h
 		intronLength(record, stats, tagDict);
 
 		// av average quality value
-		averageQV(record, stats, tagDict);
+		averageQV(record, stats);
 
 		if (options.verbosity >= 2)
 			writeRecord(bamFileStdOut, record);
@@ -673,7 +682,6 @@ int analyze_idSorted(BamFileIn & reader, Options const & options, BamHeader  & h
 		} else {
 			// same query Name => collect in set
 			if (oldRec.qName == record.qName) {
-				foundMultiHit = true;
 				appendValue(idSet, record);
 			} else {
 				// different Name => write out old...
@@ -694,6 +702,10 @@ int analyze_idSorted(BamFileIn & reader, Options const & options, BamHeader  & h
 						// TODO once Strings can be stored, store them as Strings.
 						// i.e. currently SEQAN is not able to handle strings...!!!
 						// XA  iMDZ49 NM iiciilicli1NHiIHi
+						if (! ok)
+						{
+							std::cerr << "error writing tag (4)" << std::endl;
+						}
 						if (i < nID - 1) {
 							if (idSet[i].rID == idSet[i + 1].rID) {
 								ok = setTagValue(tagDictid, "CC", '=');
@@ -721,6 +733,11 @@ int analyze_idSorted(BamFileIn & reader, Options const & options, BamHeader  & h
 		BamAlignmentRecord bar = idSet[i];
 		BamTagsDict tagDictid(bar.tags);
 		bool ok = setTagValue(tagDictid, "NH", nID);
+		if (! ok)
+		{
+			std::cerr << "error writing tag (5)" << std::endl;
+		}
+
 		writeRecord(bFile, bar);
 
 	}
@@ -741,7 +758,7 @@ int analyze_idSorted(BamFileIn & reader, Options const & options, BamHeader  & h
 	}
 
 	// Print stats
-	printStatsIDsorted(stats, reader, options, reads);
+	printStatsIDsorted(stats, reader);
 	return 0;
 }
 
@@ -786,7 +803,7 @@ doWork(BamFileIn & reader,
 
 ArgumentParser::ParseResult
 mainWithOptions(Options & options) {
-	typedef Iterator<String<CharString> >::Type TIterator;
+	//typedef Iterator<String<CharString> >::Type TIterator;
 	programStartTime = sysTime();
 	std::cout << ">>Parameters\n";
 	std::cout << "#Name\tvalue" << std::endl;

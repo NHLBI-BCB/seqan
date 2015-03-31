@@ -51,7 +51,7 @@ int main(int argc, char const ** argv)
     // Setup command line parser.
     ArgumentParser parser("sambamstat");
     Options options;
-    setupCommandLineParser(parser, options);
+    setupCommandLineParser(parser);
     
     // Then, parse the command line and handle the cases where help display
     // is requested or erroneous parameters were given.
