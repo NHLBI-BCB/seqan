@@ -41,6 +41,7 @@
 //              some clean-up (rm fasta support,...)
 // Version 0.20 remove sam/bam header info
 //              removed some variable in function declarations that were not used anymore
+// Version 0.21 moved another header info to verbose >=2
 
 #ifndef SANDBOX_JAGLA_APPS_SAMBAMSTAT_SAMBAMSTAT_H_
 #define SANDBOX_JAGLA_APPS_SAMBAMSTAT_SAMBAMSTAT_H_
@@ -68,7 +69,7 @@
 
 //#include "dataanalysis.h"
 
-#define VERSION "0.20"
+#define VERSION "0.21"
 #define PROGNAME_ID "sambamstats-ID"
 //#define PROGNAME_POS "sambamstats-POS"
 
@@ -781,8 +782,9 @@ doWork(BamFileIn & reader,
 
 	std::cerr << "old header" << std::endl;
 	BamFileOut bamFileStdOut(std::cout, Sam());
-	writeHeader(bamFileStdOut, header);
-
+	if (options.verbosity >= 2){
+		writeHeader(bamFileStdOut, header);
+	}
 	TBamContext const & bamContext = context(reader);
 
 	if (length(contigNames(bamContext)) == 0) {
