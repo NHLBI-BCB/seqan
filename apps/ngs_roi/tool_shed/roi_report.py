@@ -24,6 +24,9 @@ except ImportError:
     import argparse26 as argparse
 
 import Cheetah.Template
+import matplotlib
+matplotlib.use('Agg')
+matplotlib.rcParams['figure.max_open_warning'] = 200
 import matplotlib.pyplot as plt
 
 import ngs_roi.io
