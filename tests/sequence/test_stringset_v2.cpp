@@ -1,7 +1,7 @@
 // ==========================================================================
-// %(TITLE)s
+//                 SeqAn - The Library for Sequence Analysis
 // ==========================================================================
-// Copyright (c) 2006-2013, Knut Reinert, FU Berlin
+// Copyright (c) 2006-2015, Knut Reinert, FU Berlin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -29,35 +29,19 @@
 // DAMAGE.
 //
 // ==========================================================================
-// Author: %(AUTHOR)s
+// Author: Jochen Singer <jochen.singer@fu-berlin.de>
+// Author: Hannes Hauswedell <hannes.hauswedell@fu-berlin.de>
+// ==========================================================================
+// This file coordinates the calls of tests to ensure that the sequence
+// module fulfills the requirements.
 // ==========================================================================
 
-#ifndef %(HEADER_GUARD)s
-#define %(HEADER_GUARD)s
-
 #include <seqan/basic.h>
-#include <seqan/stream.h>
-#include <seqan/sequence.h>
 
-// A test for strings.
-SEQAN_DEFINE_TEST(test_%(NAME)s_strings_example1)
-{
-    using namespace seqan;
+// lots of stuff is still not checked and not working
+#include "test_string_set.h"
 
-    // Define some constant test data for comparison...
-    CharString const STRING1 = "test 1";
-    CharString const STRING2 = "test 2";
-
-    // Append to a string and make equality assertion on the result.
-    CharString myStr = "test ";
-    append(myStr, "1");
-    SEQAN_ASSERT_EQ(STRING1, myStr);
-
-    // Demonstration of other assertions.
-    SEQAN_ASSERT_GT(STRING2, myStr);
-    SEQAN_ASSERT_GEQ(STRING2, myStr);
-    SEQAN_ASSERT_LT(myStr, STRING2);
-    SEQAN_ASSERT_LEQ(STRING2, STRING2);
+int main(int argc, char const ** argv) {
+    seqan::TestSystem::init(argc, argv);
+    return seqan::TestSystem::runAll();
 }
-
-#endif  // %(HEADER_GUARD)s
