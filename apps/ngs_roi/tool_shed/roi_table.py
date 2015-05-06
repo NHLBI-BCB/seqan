@@ -62,7 +62,7 @@ TABLE_TPL = """
   </tr>
   #for id, roi in enumerate($records)
   <tr>
-    <td><div style="width:${args.plot_width}; margin:2px; height:${args.plot_height+1}; background:url(thumbnail_${imgId($id)}.png) -${imgX($id)} -${imgY($id)};"></div></td>
+    <td><div style="width:${args.plot_width}; margin:2px; height:${args.plot_height+1}; background-image:url(thumbnail_${imgId($id)}.png); background-position -${imgX($id)} -${imgY($id)};"></div></td>
     <td>$roi.ref</td>
     <td style="text-align:right;">$fmtPos($roi.start_pos + 1)</td>
     <td style="text-align:right;">$fmtPos($roi.end_pos)</td>
@@ -114,7 +114,7 @@ class RoiTable(object):
 
         def imgY(idx):
             """y position in image from record id."""
-            y = idx / self.args.num_cols
+            y = idx % self.args.num_cols
             res = y * self.args.plot_height
             res += y * 2
             return res
