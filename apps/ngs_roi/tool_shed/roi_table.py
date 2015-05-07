@@ -62,7 +62,7 @@ TABLE_TPL = """
   </tr>
   #for id, roi in enumerate($records)
   <tr>
-    <td><div style="width:${args.plot_width}; margin:2px; height:${args.plot_height+1}; background-image:url(thumbnail_${imgId($id)}.png); background-position -${imgX($id)} -${imgY($id)};"></div></td>
+    <td><div style="width:${args.plot_width}; margin:2px; height:${args.plot_height+1}; background-image:url(thumbnail_${imgId($id)}.png); background-position: -${imgX($id)} -${imgY($id)};"></div></td>
     <td>$roi.ref</td>
     <td style="text-align:right;">$fmtPos($roi.start_pos + 1)</td>
     <td style="text-align:right;">$fmtPos($roi.end_pos)</td>
@@ -71,7 +71,7 @@ TABLE_TPL = """
     <td style="text-align:center;">$roi.strand</td>
     <td style="text-align:right;">$roi.max_count</td>
     #for i, key in enumerate($data_keys)
-    <td>$roi.data[$i]</td>
+    <td>${dataVal(roi.data[$i])}</td>
     #end for
   </tr>
   #end for
@@ -114,12 +114,18 @@ class RoiTable(object):
 
         def imgY(idx):
             """y position in image from record id."""
-            y = idx % self.args.num_cols
+            y = ( idx % (self.args.num_rows * self.args.num_cols) ) / self.args.num_cols
             res = y * self.args.plot_height
             res += y * 2
             return res
 
-        return {'fmtPos': intWithCommas, 'imgId': imgId, 'imgX': imgX, 'imgY': imgY}
+        def dataVal(x):
+            if type(x) not in [type(0), type(0L)]:
+                return x
+            res = round(x,4)
+            return res
+
+        return {'fmtPos': intWithCommas, 'imgId': imgId, 'imgX': imgX, 'imgY': imgY, 'dataVal': dataVal}
 
     def render(self):
         """Returns string with rendered table."""
@@ -138,12 +144,11 @@ class TableApp(ngs_roi.app.App):
 
     def run(self):
         # Load ROI records.
-        print >>sys.stderr, 'Loading ROI'
         records = ngs_roi.io.load(self.args.in_file, self.args.max_rois)
         keys = []
         if records:
             keys = records[0].data_keys
-
+        print >>sys.stderr, keys
         # Create plots.
         print >>sys.stderr, 'Creating plots...'
         runner = ngs_roi.app.PlotThumbnailsRunner(self.args)
