@@ -380,7 +380,7 @@ void createTmpFile(char * tmpFPnam, Options const & options,
 	std::cerr << "this is options.tempDir " << options.tmpDir << " is set"
 			<< std::endl;
 	tmpFPnam = strcpy(tmpFPnam, tmpDir);
-	tmpFPnam = strcat(tmpFPnam, "/samBamStatXXXXXX");
+	tmpFPnam = strcat(tmpFPnam, "/samsBamStatXXXXXX");
 #if defined(_WIN32)
 	tmpFPnam = strcat(toCString(options.outFileName), ".tmp");
 #else
@@ -600,7 +600,7 @@ int analyze_idSorted(BamFileIn & reader, Options const & options, BamHeader  & h
 //	if (options.verbosity >= 2)
 //		writeHeader(bamFileStdOut, newHeader);
 
-	resize(stats.rIDs, length(bamContext) + 1, 0);
+	resize(stats.rIDs, length(contigNames(bamContext)) + 1, 0);
 	StringSet<BamAlignmentRecord> idSet;
 	BamAlignmentRecord oldRec;
 	oldRec.qName = "";

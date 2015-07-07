@@ -7,8 +7,8 @@
 # ===========================================================================
 
 cmake_minimum_required (VERSION 2.8.2)
-project (seqan_sandbox_seqan_ngs_apps_apps_sambamstat)
-message (STATUS "Configuring sandbox/seqan_ngs_apps/apps/sambamstat")
+project (apps_sambamstat)
+message (STATUS "Configuring apps/sambamstat")
 
 # ----------------------------------------------------------------------------
 # Dependencies
