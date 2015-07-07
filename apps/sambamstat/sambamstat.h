@@ -649,11 +649,7 @@ int analyze_idSorted(BamFileIn & reader, Options const & options, BamHeader  & h
 		lengthHist(stats, record);
 
 		// count reference ids
-		if (record.rID == BamAlignmentRecord::INVALID_REFID) {
-			stats.rIDs[0]++;
-		} else {
-			stats.rIDs[record.rID + 1]++;
-		}
+		stats.rIDs[(record.rID == BamAlignmentRecord::INVALID_REFID ? 0 : record.rID + 1)]++;
 
 
 		/*
