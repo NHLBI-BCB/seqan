@@ -70,7 +70,7 @@
 
 //#include "dataanalysis.h"
 
-#define VERSION "0.22"
+#define VERSION "0.23"
 #define PROGNAME_ID "sambamstats-ID"
 //#define PROGNAME_POS "sambamstats-POS"
 
@@ -380,7 +380,7 @@ void createTmpFile(char * tmpFPnam, Options const & options,
 	std::cerr << "this is options.tempDir " << options.tmpDir << " is set"
 			<< std::endl;
 	tmpFPnam = strcpy(tmpFPnam, tmpDir);
-	tmpFPnam = strcat(tmpFPnam, "/samsBamStatXXXXXX");
+	tmpFPnam = strcat(tmpFPnam, "/samBamStatXXXXXX");
 #if defined(_WIN32)
 	tmpFPnam = strcat(toCString(options.outFileName), ".tmp");
 #else
