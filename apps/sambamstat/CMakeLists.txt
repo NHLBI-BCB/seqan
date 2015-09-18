@@ -66,11 +66,11 @@ install (FILES LICENSE
 # ----------------------------------------------------------------------------
 
 #seqan_add_app_test (sambamstat)
-if(PYTHONINTERP_FOUND)
+#if(PYTHONINTERP_FOUND)
   add_test(NAME app_test_sambamstat COMMAND ${PYTHON_EXECUTABLE}
     ${CMAKE_CURRENT_SOURCE_DIR}/tests/run_tests.py ${CMAKE_SOURCE_DIR}
     ${CMAKE_BINARY_DIR})
-endif(PYTHONINTERP_FOUND)
+#endif(PYTHONINTERP_FOUND)
 
 # ----------------------------------------------------------------------------
 # CPack Install

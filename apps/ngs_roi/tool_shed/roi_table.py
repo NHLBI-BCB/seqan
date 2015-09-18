@@ -35,6 +35,20 @@ import ngs_roi.io
 # Main template.
 PAGE_TPL = """
 <html>
+<!-- DataTables CSS -->
+<link rel="stylesheet" type="text/css" href="http://cdn.datatables.net/1.10.9/css/jquery.dataTables.css">
+  
+<!-- jQuery -->
+<script type="text/javascript" charset="utf8" src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+  
+<!-- DataTables -->
+<script type="text/javascript" charset="utf8" src="http://cdn.datatables.net/1.10.9/js/jquery.dataTables.js"></script>
+
+<script type="text/javascript" id="js">\$(document).ready(function(){
+    \$('#roiTable').DataTable();
+});
+</script>
+
   <head><title>ROI Table</title></head>
   <body>
     <h1>ROI Table</h1>
@@ -46,7 +60,8 @@ PAGE_TPL = """
 
 # Template for a table.
 TABLE_TPL = """
-<table border="1">
+<table id="roiTable" class="display" border="1">
+  <thead>
   <tr>
     <th>plot</th>
     <th>chr</th>
@@ -60,6 +75,8 @@ TABLE_TPL = """
     <th>$key</th>
     #end for
   </tr>
+  </thead>
+  <tbody>
   #for id, roi in enumerate($records)
   <tr>
     <td><div style="width:${args.plot_width}; margin:2px; height:${args.plot_height+1}; background-image:url(thumbnail_${imgId($id)}.png); background-position: -${imgX($id)} -${imgY($id)};"></div></td>
@@ -75,6 +92,7 @@ TABLE_TPL = """
     #end for
   </tr>
   #end for
+  </tbody>
 </table>
 """
 
